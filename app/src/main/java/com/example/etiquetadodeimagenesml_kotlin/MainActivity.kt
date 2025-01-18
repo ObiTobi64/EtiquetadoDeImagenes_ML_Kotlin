@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun EtiquetarImagenGaleria(imageUri: Uri) {
+        Resultados.text = "" //Esta linea nos sirve para evitar el duplicado de resultados
         progressDialog.setMessage("Reconociendo objetos de la imagen")
         progressDialog.show()
 
@@ -179,6 +180,8 @@ class MainActivity : AppCompatActivity() {
                 imageUri = data!!.data
 
                 Imagen.setImageURI(imageUri)
+                Resultados.text = "" //Para limpiar los datos al agregar una nueva imagen
+
             }else{
                 Toast.makeText(applicationContext,"Cancelado por el usuario",Toast.LENGTH_SHORT).show()
             }
