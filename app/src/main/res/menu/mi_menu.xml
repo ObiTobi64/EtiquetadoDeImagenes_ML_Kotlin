@@ -4,6 +4,9 @@
     <item
         android:id="@+id/MenuGaleria"
         android:title="@string/MenuGaleria"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/MenuTraducir"
+        android:title="@string/MenuTraducir"/>
 </menu>

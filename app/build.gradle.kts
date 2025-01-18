@@ -50,4 +50,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("com.google.mlkit:image-labeling:17.0.9")
+    implementation ("com.google.mlkit:translate:17.0.1")
 }

@@ -22,6 +22,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.Translator
+import com.google.mlkit.nl.translate.TranslatorOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeler
 import com.google.mlkit.vision.label.ImageLabeling
@@ -39,7 +43,17 @@ class MainActivity : AppCompatActivity() {
 
     var imageUri : Uri ?= null
 
+    private lateinit var translatorOptions : TranslatorOptions
+    private lateinit var translator : Translator
+
+    private val codigo_idioma_origen = "en"
+    private val codigo_idioma_destino = "es"
+
+    private var Texto_etiquetas = ""
+
     @SuppressLint("MissingInflatedId")
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -89,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                         //Obtener el indice
                         val indice = imageLabel.index
 
-                        Resultados.append("Etiqueta: $etiqueta \n Confianza: $confianza \n Indice: $indice \n \n")
+                        Resultados.append("|||Name: $etiqueta \n - with a confidence of: $confianza \n - and it's index is: $indice \n \n")
 
                     }
                     progressDialog.dismiss()
@@ -138,6 +152,44 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun TraducirTexto(){
+        Texto_etiquetas = Resultados.text.toString().trim()
+        progressDialog.setMessage("Procesando")
+        progressDialog.show()
+
+        translatorOptions = TranslatorOptions.Builder()
+            .setSourceLanguage(codigo_idioma_origen)
+            .setTargetLanguage(codigo_idioma_destino)
+            .build()
+
+        translator = Translation.getClient(translatorOptions)
+
+        val downloadConditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        translator.downloadModelIfNeeded(downloadConditions)
+            .addOnSuccessListener {
+                progressDialog.setMessage("Traduciendo Etiquetas")
+
+                //Este es el momento en el que se realiza la traducción
+                translator.translate(Texto_etiquetas)
+                    .addOnSuccessListener {etiquetasTraducidas->
+                        progressDialog.dismiss()
+                        Resultados.text = etiquetasTraducidas
+
+                    }
+                    .addOnFailureListener {e->
+                        progressDialog.dismiss()
+                        Toast.makeText(applicationContext,"${e.message}",Toast.LENGTH_SHORT).show()
+
+                    }
+            }.addOnFailureListener {e->
+                progressDialog.dismiss()
+                Toast.makeText(applicationContext,"${e.message}",Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun InicializarVistas(){
         Imagen = findViewById(R.id.Imagen)
         BtnEtiquetarImagen = findViewById(R.id.BtnEtiquetarImagen)
@@ -159,6 +211,16 @@ class MainActivity : AppCompatActivity() {
             R.id.MenuGaleria->{
                 //Toast.makeText(applicationContext,"Abir galeria",Toast.LENGTH_SHORT).show()
                 SeleccionarImagenGaleria()
+                true
+            }
+
+            R.id.MenuTraducir->{
+                Texto_etiquetas = Resultados.text.toString().trim()
+                if (!Texto_etiquetas.isEmpty()){
+                    TraducirTexto()
+                }else{
+                    Toast.makeText(applicationContext,"No hay etiquetas para traducir",Toast.LENGTH_SHORT).show()
+                }
                 true
             }
             else->super.onOptionsItemSelected(item)
