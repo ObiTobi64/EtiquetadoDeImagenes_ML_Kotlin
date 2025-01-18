@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Etiquetado de imagenes ML - Kotlin</string>
+    <string name="app_name">Etiquetado de imagenes ML</string>
 
     <string name="BtnEtiquetarImagen">Reconocer Objetos</string>
     <string name="TxtResultado">Resultados de la imagen</string>
