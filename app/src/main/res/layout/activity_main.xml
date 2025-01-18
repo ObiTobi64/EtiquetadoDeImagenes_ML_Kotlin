@@ -13,10 +13,17 @@
         android:padding="10dp"
         android:orientation="vertical">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="Mi Aplicación"
+            app:titleTextColor="@android:color/white" />
+
         <ImageView
             android:id="@+id/Imagen"
             android:background="#ccc"
-            android:src="@drawable/auto"
             android:layout_width="match_parent"
             android:layout_height="300dp"/>
 
