@@ -26,6 +26,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeler
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,9 +53,54 @@ class MainActivity : AppCompatActivity() {
         //val bitmap = bitmapDrawable.bitmap
 
         BtnEtiquetarImagen.setOnClickListener {
-            //Toast.makeText(applicationContext,"Etiquetando imagen",Toast.LENGTH_SHORT).show()
-
           //  EtiquetarImagen(bitmap)
+            if (imageUri!=null){
+                EtiquetarImagenGaleria(imageUri!!)
+            }else{
+                Toast.makeText(applicationContext,"Por favor añada una imagen", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun EtiquetarImagenGaleria(imageUri: Uri) {
+        progressDialog.setMessage("Reconociendo objetos de la imagen")
+        progressDialog.show()
+
+        var inputImage : InputImage ?= null
+
+        try {
+            inputImage = InputImage.fromFilePath(applicationContext,imageUri)
+        }catch (e: IOException){
+            e.printStackTrace()
+        }
+
+        if (inputImage!=null){
+            imageLabeler.process(inputImage)
+
+                .addOnSuccessListener {labels->
+                    for (imageLabel in labels){
+                        //Obtener la etiqueta
+                        val etiqueta = imageLabel.text
+
+                        //Obtener el porcentaje de confianza
+                        val confianza = imageLabel.confidence
+
+                        //Obtener el indice
+                        val indice = imageLabel.index
+
+                        Resultados.append("Etiqueta: $etiqueta \n Confianza: $confianza \n Indice: $indice \n \n")
+
+                    }
+                    progressDialog.dismiss()
+
+                }
+                .addOnFailureListener {e->
+
+                    progressDialog.dismiss()
+                    Toast.makeText(applicationContext,"No se pudo realizar el etiquetado de imagen debido a ${e.message}"
+                        ,Toast.LENGTH_SHORT).show()
+
+                }
         }
     }
 
